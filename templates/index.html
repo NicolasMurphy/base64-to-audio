@@ -1,0 +1,136 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Base64 to Audio Generator</title>
+</head>
+<body>
+    <h1>Base64 to Audio Generator</h1>
+
+    <textarea id="textInput" rows="15" cols="80" placeholder="Enter valid Base64 here...">aGVsbG8gd29ybGQ=</textarea>
+    <br><br>
+    <button onclick="generateAudio()" id="generateBtn">Generate Audio</button>
+
+    <div id="status"></div>
+    <br>
+    <audio id="audioPlayer" controls style="display:none; width: 400px;"></audio>
+
+    <script>
+        function generateAudio() {
+            const text = document.getElementById('textInput').value.trim();
+            const status = document.getElementById('status');
+            const audioPlayer = document.getElementById('audioPlayer');
+            const generateBtn = document.getElementById('generateBtn');
+
+            if (!text) {
+                status.textContent = 'Please enter some Base64 text first!';
+                return;
+            }
+
+            generateBtn.disabled = true;
+            generateBtn.textContent = 'Generating...';
+            status.textContent = 'Converting Base64 to audio...';
+
+            try {
+                // Step 1: Decode Base64 to get raw bytes
+                let decodedBytes;
+                try {
+                    decodedBytes = atob(text);
+                } catch (e) {
+                    throw new Error('Invalid Base64 input');
+                }
+
+                if (decodedBytes.length === 0) {
+                    throw new Error('Base64 decoded to empty data');
+                }
+
+                // Step 2: Create WAV file from the decoded bytes
+                const sampleRate = 44100;
+                const wavBuffer = createWAVFromBytes(decodedBytes, sampleRate);
+
+                // Step 3: Create blob and audio URL
+                const audioBlob = new Blob([wavBuffer], { type: 'audio/wav' });
+                const audioUrl = URL.createObjectURL(audioBlob);
+
+                // Step 4: Set up audio player
+                audioPlayer.src = audioUrl;
+                audioPlayer.style.display = 'block';
+
+                const duration = decodedBytes.length / sampleRate;
+                status.textContent = `✓ Generated ${decodedBytes.length} byte WAV file! Duration: ${duration.toFixed(3)}s`;
+
+                // Clean up previous URL
+                if (audioPlayer.dataset.prevUrl) {
+                    URL.revokeObjectURL(audioPlayer.dataset.prevUrl);
+                }
+                audioPlayer.dataset.prevUrl = audioUrl;
+
+            } catch (error) {
+                status.textContent = 'Error: ' + error.message;
+                console.error('Audio generation error:', error);
+            } finally {
+                generateBtn.disabled = false;
+                generateBtn.textContent = 'Generate Audio';
+            }
+        }
+
+        function createWAVFromBytes(decodedString, sampleRate) {
+            const length = decodedString.length;
+            const buffer = new ArrayBuffer(44 + length * 2); // 44 byte header + 2 bytes per sample
+            const view = new DataView(buffer);
+
+            let pos = 0;
+
+            // Write string to buffer helper
+            function writeString(str) {
+                for (let i = 0; i < str.length; i++) {
+                    view.setUint8(pos++, str.charCodeAt(i));
+                }
+            }
+
+            // WAV header
+            writeString('RIFF');
+            view.setUint32(pos, 36 + length * 2, true); pos += 4;
+            writeString('WAVE');
+            writeString('fmt ');
+            view.setUint32(pos, 16, true); pos += 4; // PCM chunk size
+            view.setUint16(pos, 1, true); pos += 2;  // PCM format
+            view.setUint16(pos, 1, true); pos += 2;  // Mono
+            view.setUint32(pos, sampleRate, true); pos += 4; // Sample rate
+            view.setUint32(pos, sampleRate * 2, true); pos += 4; // Byte rate
+            view.setUint16(pos, 2, true); pos += 2;  // Block align
+            view.setUint16(pos, 16, true); pos += 2; // Bits per sample
+            writeString('data');
+            view.setUint32(pos, length * 2, true); pos += 4;
+
+            // Convert decoded bytes to 16-bit signed samples
+            for (let i = 0; i < length; i++) {
+                const byte = decodedString.charCodeAt(i); // Get byte value (0-255)
+                const sample = (byte - 128) * 256; // Convert to signed 16-bit (-32768 to 32767)
+                view.setInt16(pos, sample, true); // Write as little-endian
+                pos += 2;
+            }
+
+            return buffer;
+        }
+
+        // Allow Ctrl+Enter to generate audio
+        document.getElementById('textInput').addEventListener('keydown', function(event) {
+            if (event.ctrlKey && event.key === 'Enter') {
+                generateAudio();
+            }
+        });
+    </script>
+
+    <div>
+        <h3>Base64 Requirements:</h3>
+        <ul>
+            <li><strong>Valid characters only:</strong> A-Z, a-z, 0-9, +, /</li>
+            <li><strong>Proper padding:</strong> Must end with correct number of = signs (0, 1, or 2)</li>
+            <li><strong>Length divisible by 4:</strong> Base64 strings must be multiples of 4 characters</li>
+            <li><strong>No whitespace or special characters</strong> (except + and /)</li>
+        </ul>
+    </div>
+</body>
+</html>
