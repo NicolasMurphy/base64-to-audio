@@ -6,6 +6,10 @@ import base64
 
 app = Flask(__name__)
 
+# Audio generation limits
+MAX_AUDIO_DURATION_SECONDS = 30
+MAX_DECODED_BYTES = MAX_AUDIO_DURATION_SECONDS * 44100 * 2  # 2,646,000 bytes
+
 
 def is_wav_data(decoded_bytes):
     """Check if the decoded bytes represent a WAV file"""
@@ -14,6 +18,30 @@ def is_wav_data(decoded_bytes):
         and decoded_bytes[:4] == b"RIFF"
         and decoded_bytes[8:12] == b"WAVE"
     )
+
+
+def validate_audio_size(text):
+    """Validate that the decoded audio data doesn't exceed duration limits"""
+    try:
+        decoded = base64.b64decode(text, validate=True)
+        decoded_size = len(decoded)
+
+        # Check if it's already a WAV file
+        if is_wav_data(decoded):
+            # For WAV files, we'll allow them through since they have their own duration
+            # and the size limit is mainly for raw data conversion
+            return True, None
+
+        if decoded_size > MAX_DECODED_BYTES:
+            actual_duration = decoded_size / (44100 * 2)
+            return (
+                False,
+                f"Audio would be {actual_duration:.1f} seconds (max: {MAX_AUDIO_DURATION_SECONDS}s). Try shorter Base64 data.",
+            )
+
+        return True, None
+    except Exception as e:
+        return False, f"Invalid Base64 format: {str(e)}"
 
 
 def analyze_base64_for_audio(text):
@@ -42,6 +70,7 @@ def analyze_base64_for_audio(text):
     issues = []
     suggestions = []
     facts = []
+    warnings = []
 
     # Check if it's already a WAV file
     if is_wav_data(decoded):
@@ -60,13 +89,22 @@ def analyze_base64_for_audio(text):
     facts.append(f"Your Base64 text: {len(text)} characters")
     facts.append(f"Decoded data size: {data_length} bytes")
 
-    # Length analysis
+    # Length analysis and duration limit check
     if data_length < 100:
         issues.append(f"Data is only {data_length} bytes - very short for audio")
         suggestions.append("Try longer Base64 text (aim for 100+ bytes)")
 
     duration_44k = (data_length / 2) / 44100
     facts.append(f"Would create {duration_44k:.4f} seconds of audio at 44.1kHz")
+
+    # Check against generation limit
+    if data_length > MAX_DECODED_BYTES:
+        warnings.append(
+            f"⚠ This would create {duration_44k:.1f}s of audio, exceeding the {MAX_AUDIO_DURATION_SECONDS}s limit for generation"
+        )
+        suggestions.append(
+            f"Reduce Base64 length to stay under {MAX_AUDIO_DURATION_SECONDS} seconds"
+        )
 
     # Even bytes check for 16-bit audio
     if data_length % 2 != 0:
@@ -80,9 +118,10 @@ def analyze_base64_for_audio(text):
     facts.append(f"Creates {sample_count} audio samples")
 
     return {
-        "valid": len(issues) == 0,
+        "valid": len(issues) == 0 and len(warnings) == 0,
         "is_wav": False,
         "issues": issues,
+        "warnings": warnings,
         "suggestions": suggestions,
         "facts": facts,
         "stats": {
@@ -90,6 +129,7 @@ def analyze_base64_for_audio(text):
             "decoded_size": data_length,
             "sample_count": sample_count,
             "duration_seconds": duration_44k,
+            "within_limit": data_length <= MAX_DECODED_BYTES,
         },
     }
 
@@ -150,17 +190,22 @@ def analyze():
 def generate_audio():
     """Generate audio from Base64 input"""
     if not request.is_json or request.json is None:
-        return "JSON required", 400
+        return jsonify({"error": "JSON required"}), 400
 
     text = request.json.get("text", "").strip()
     if not text:
-        return "No text provided", 400
+        return jsonify({"error": "No text provided"}), 400
+
+    # Validate size before processing
+    size_valid, size_error = validate_audio_size(text)
+    if not size_valid:
+        return jsonify({"error": size_error}), 400
 
     try:
         wav_buffer = text_to_wav_base64(text)
         return send_file(wav_buffer, mimetype="audio/wav", as_attachment=False)
     except Exception as e:
-        return f"Error: {str(e)}", 500
+        return jsonify({"error": f"Error generating audio: {str(e)}"}), 500
 
 
 if __name__ == "__main__":

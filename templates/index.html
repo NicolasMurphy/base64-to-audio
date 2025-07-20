@@ -89,6 +89,15 @@ PmHzhytR4HsTbXQV0E4mxCFBD2WNGjDqQoY71BcTxvq487jpo3X6rZE4KpRpbcgaWq52+Kt0kWO6GjEU
             html += "</ul>";
           }
 
+          if (result.warnings && result.warnings.length > 0) {
+            html += "<p><strong>Warnings:</strong></p><ul>";
+            result.warnings.forEach(
+              (warning) =>
+                (html += `<li style="color: orange;">${warning}</li>`)
+            );
+            html += "</ul>";
+          }
+
           if (result.suggestions && result.suggestions.length > 0) {
             html += "<p><strong>Suggestions:</strong></p><ul>";
             result.suggestions.forEach(
@@ -151,11 +160,18 @@ PmHzhytR4HsTbXQV0E4mxCFBD2WNGjDqQoY71BcTxvq487jpo3X6rZE4KpRpbcgaWq52+Kt0kWO6GjEU
             output.innerHTML =
               '<p style="color: green;">✓ Audio generated successfully!</p>';
           } else {
-            const error = await response.text();
-            output.innerHTML = `<p style="color: red;">Server error: ${error}</p>`;
+            // Handle both JSON and text error responses
+            let errorMessage;
+            try {
+              const errorJson = await response.json();
+              errorMessage = errorJson.error || "Unknown error";
+            } catch {
+              errorMessage = await response.text();
+            }
+            output.innerHTML = `<p style="color: red;">Error: ${errorMessage}</p>`;
           }
         } catch (error) {
-          output.innerHTML = `<p style="color: red;">Error: ${error.message}</p>`;
+          output.innerHTML = `<p style="color: red;">Network error: ${error.message}</p>`;
         }
       }
 
@@ -164,30 +180,43 @@ PmHzhytR4HsTbXQV0E4mxCFBD2WNGjDqQoY71BcTxvq487jpo3X6rZE4KpRpbcgaWq52+Kt0kWO6GjEU
         const output = document.getElementById("output");
 
         if (type === "random") {
-          // Generate random bytes that should make interesting audio
-          const randomBytes = new Uint8Array(800);
+          // Generate random bytes that should make interesting audio (5 seconds)
+          const randomBytes = new Uint8Array(441000); // 5 seconds at 44.1kHz
           for (let i = 0; i < randomBytes.length; i++) {
             randomBytes[i] = Math.floor(Math.random() * 256);
           }
           textarea.value = btoa(String.fromCharCode(...randomBytes));
           output.innerHTML =
-            "<p>Loaded random data. This should create some wild audio!</p>";
+            "<p>Loaded 5 seconds of random data. This should create some wild audio!</p>";
         } else if (type === "pattern") {
-          // Generate a sine wave pattern in the data
-          const patternBytes = new Uint8Array(1000);
-          for (let i = 0; i < patternBytes.length; i++) {
-            // Create a sine wave pattern
-            patternBytes[i] = Math.floor(128 + 127 * Math.sin(i * 0.05));
+          // Generate a sine wave pattern (3 seconds)
+          const patternBytes = new Uint8Array(264600); // 3 seconds at 44.1kHz
+          for (let i = 0; i < patternBytes.length; i += 2) {
+            // Create a sine wave pattern (440Hz tone)
+            const sample = Math.floor(
+              32767 * Math.sin((2 * Math.PI * 440 * (i / 2)) / 44100)
+            );
+            // Convert to 16-bit little-endian
+            patternBytes[i] = sample & 0xff;
+            patternBytes[i + 1] = (sample >> 8) & 0xff;
           }
           textarea.value = btoa(String.fromCharCode(...patternBytes));
           output.innerHTML =
-            "<p>Loaded pattern data. This should create a tone!</p>";
+            "<p>Loaded 3 seconds of 440Hz sine wave data. This should create a clear tone!</p>";
         }
       }
 
-      // Auto-analyze the default example when page loads
-      window.addEventListener("load", function () {
-        setTimeout(analyzeInput, 500);
+      // Auto-analyze when examples are loaded
+      function loadExampleAndAnalyze(type) {
+        loadExample(type);
+        setTimeout(analyzeInput, 100);
+      }
+
+      // Update the button clicks
+      document.addEventListener("DOMContentLoaded", function () {
+        const buttons = document.querySelectorAll("button");
+        buttons[2].onclick = () => loadExampleAndAnalyze("random");
+        buttons[3].onclick = () => loadExampleAndAnalyze("pattern");
       });
     </script>
 
@@ -199,18 +228,11 @@ PmHzhytR4HsTbXQV0E4mxCFBD2WNGjDqQoY71BcTxvq487jpo3X6rZE4KpRpbcgaWq52+Kt0kWO6GjEU
     </p>
     <p>
       <strong>Generate Audio:</strong> Converts your Base64 to a playable audio
-      file - any data makes sound!
+      file - any data makes sound! (30 second limit)
     </p>
     <p>
       <strong>Examples:</strong> Try random data or patterns to hear different
       audio effects
     </p>
-
-    <h3>WAV Audio Requirements:</h3>
-    <ul>
-      <li>WAV files need proper headers (RIFF...WAVE format)</li>
-      <li>16-bit audio needs even number of bytes (2 bytes per sample)</li>
-      <li>More data = longer audio duration</li>
-    </ul>
   </body>
 </html>
