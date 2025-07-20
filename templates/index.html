@@ -1,136 +1,216 @@
 <!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Base64 to Audio Generator</title>
-</head>
-<body>
+<html>
+  <head>
+    <title>Base64 to Audio</title>
+  </head>
+  <body>
     <h1>Base64 to Audio Generator</h1>
 
-    <textarea id="textInput" rows="15" cols="80" placeholder="Enter valid Base64 here...">aGVsbG8gd29ybGQ=</textarea>
-    <br><br>
-    <button onclick="generateAudio()" id="generateBtn">Generate Audio</button>
+    <textarea
+      id="textInput"
+      rows="10"
+      cols="80"
+      placeholder="Enter Base64 here..."
+    >
+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AAAAAAAAAAAAAAAAAAAAAAAAAAAaAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAaAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAaAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAaAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAaAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAaAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAaAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAaAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAaAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAaAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAaAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAaAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAaAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAaAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAaAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAaAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAaAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAaAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAaAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAaAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAaAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAaAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAaAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAaAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAaAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAaAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAaAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAaAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAaAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAaAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAaAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAaAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAaAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAaAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAaAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAaAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAaAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAaAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAaAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAaAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAaAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAaAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAaAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAaAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAaAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAaAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAaAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAaAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAaAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAaAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAaAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAaAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAaAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAaAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAaAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAaAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAaAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAaAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAaAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAaAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAaAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAaAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAaAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAaAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAaAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAaAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAaAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAaAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAaAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAaAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAaAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAaAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAaAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAaAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAaAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAaAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAaAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAaAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAaAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAaAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAaAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAaAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAaAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAaAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAaAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAaAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAaAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAaAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAaAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAaAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAaAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAaAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAaAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAaAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAaAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAaAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAaAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAaAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAaAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAaAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAaAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAaAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAaAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAaAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAa=
+</textarea
+    ><br /><br />
 
-    <div id="status"></div>
-    <br>
-    <audio id="audioPlayer" controls style="display:none; width: 400px;"></audio>
+    <button onclick="analyzeInput()">Analyze Input</button>
+    <button onclick="generateAudio()">Generate Audio</button>
+    <button onclick="loadExample('random')">Random Audio Data</button>
+    <button onclick="loadExample('pattern')">Pattern Audio</button><br /><br />
+
+    <div id="output"></div>
+
+    <audio id="audioPlayer" controls style="display: none"></audio>
 
     <script>
-        function generateAudio() {
-            const text = document.getElementById('textInput').value.trim();
-            const status = document.getElementById('status');
-            const audioPlayer = document.getElementById('audioPlayer');
-            const generateBtn = document.getElementById('generateBtn');
+      async function analyzeInput() {
+        const text = document.getElementById("textInput").value.trim();
+        const output = document.getElementById("output");
 
-            if (!text) {
-                status.textContent = 'Please enter some Base64 text first!';
-                return;
-            }
-
-            generateBtn.disabled = true;
-            generateBtn.textContent = 'Generating...';
-            status.textContent = 'Converting Base64 to audio...';
-
-            try {
-                // Step 1: Decode Base64 to get raw bytes
-                let decodedBytes;
-                try {
-                    decodedBytes = atob(text);
-                } catch (e) {
-                    throw new Error('Invalid Base64 input');
-                }
-
-                if (decodedBytes.length === 0) {
-                    throw new Error('Base64 decoded to empty data');
-                }
-
-                // Step 2: Create WAV file from the decoded bytes
-                const sampleRate = 44100;
-                const wavBuffer = createWAVFromBytes(decodedBytes, sampleRate);
-
-                // Step 3: Create blob and audio URL
-                const audioBlob = new Blob([wavBuffer], { type: 'audio/wav' });
-                const audioUrl = URL.createObjectURL(audioBlob);
-
-                // Step 4: Set up audio player
-                audioPlayer.src = audioUrl;
-                audioPlayer.style.display = 'block';
-
-                const duration = decodedBytes.length / sampleRate;
-                status.textContent = `✓ Generated ${decodedBytes.length} byte WAV file! Duration: ${duration.toFixed(3)}s`;
-
-                // Clean up previous URL
-                if (audioPlayer.dataset.prevUrl) {
-                    URL.revokeObjectURL(audioPlayer.dataset.prevUrl);
-                }
-                audioPlayer.dataset.prevUrl = audioUrl;
-
-            } catch (error) {
-                status.textContent = 'Error: ' + error.message;
-                console.error('Audio generation error:', error);
-            } finally {
-                generateBtn.disabled = false;
-                generateBtn.textContent = 'Generate Audio';
-            }
+        if (!text) {
+          output.innerHTML =
+            '<p style="color: red;">Please enter some Base64 text!</p>';
+          return;
         }
 
-        function createWAVFromBytes(decodedString, sampleRate) {
-            const length = decodedString.length;
-            const buffer = new ArrayBuffer(44 + length * 2); // 44 byte header + 2 bytes per sample
-            const view = new DataView(buffer);
+        try {
+          const response = await fetch("/analyze", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ text: text }),
+          });
 
-            let pos = 0;
+          const result = await response.json();
+          displayAnalysis(result);
+        } catch (error) {
+          output.innerHTML = `<p style="color: red;">Error: ${error.message}</p>`;
+        }
+      }
 
-            // Write string to buffer helper
-            function writeString(str) {
-                for (let i = 0; i < str.length; i++) {
-                    view.setUint8(pos++, str.charCodeAt(i));
-                }
-            }
+      function displayAnalysis(result) {
+        const output = document.getElementById("output");
+        let html = "<h3>Analysis Results:</h3>";
 
-            // WAV header
-            writeString('RIFF');
-            view.setUint32(pos, 36 + length * 2, true); pos += 4;
-            writeString('WAVE');
-            writeString('fmt ');
-            view.setUint32(pos, 16, true); pos += 4; // PCM chunk size
-            view.setUint16(pos, 1, true); pos += 2;  // PCM format
-            view.setUint16(pos, 1, true); pos += 2;  // Mono
-            view.setUint32(pos, sampleRate, true); pos += 4; // Sample rate
-            view.setUint32(pos, sampleRate * 2, true); pos += 4; // Byte rate
-            view.setUint16(pos, 2, true); pos += 2;  // Block align
-            view.setUint16(pos, 16, true); pos += 2; // Bits per sample
-            writeString('data');
-            view.setUint32(pos, length * 2, true); pos += 4;
-
-            // Convert decoded bytes to 16-bit signed samples
-            for (let i = 0; i < length; i++) {
-                const byte = decodedString.charCodeAt(i); // Get byte value (0-255)
-                const sample = (byte - 128) * 256; // Convert to signed 16-bit (-32768 to 32767)
-                view.setInt16(pos, sample, true); // Write as little-endian
-                pos += 2;
-            }
-
-            return buffer;
+        if (result.error) {
+          html += `<p style="color: red;"><strong>Error:</strong> ${result.error}</p>`;
+          if (result.suggestions) {
+            html += "<p><strong>Suggestions:</strong></p><ul>";
+            result.suggestions.forEach((s) => (html += `<li>${s}</li>`));
+            html += "</ul>";
+          }
+          output.innerHTML = html;
+          return;
         }
 
-        // Allow Ctrl+Enter to generate audio
-        document.getElementById('textInput').addEventListener('keydown', function(event) {
-            if (event.ctrlKey && event.key === 'Enter') {
-                generateAudio();
+        if (result.is_wav) {
+          html += `<p style="color: green;"><strong>${result.message}</strong></p>`;
+          html += "<p><strong>Stats:</strong></p><ul>";
+          Object.entries(result.stats).forEach(([key, value]) => {
+            html += `<li>${key}: ${value}</li>`;
+          });
+          html += "</ul>";
+        } else {
+          if (result.valid) {
+            html +=
+              '<p style="color: green;"><strong>✓ Input looks okay for audio conversion</strong></p>';
+          } else {
+            html +=
+              '<p style="color: orange;"><strong>⚠ Issues found with your input:</strong></p>';
+          }
+
+          if (result.issues && result.issues.length > 0) {
+            html += "<p><strong>Issues:</strong></p><ul>";
+            result.issues.forEach(
+              (issue) => (html += `<li style="color: red;">${issue}</li>`)
+            );
+            html += "</ul>";
+          }
+
+          if (result.suggestions && result.suggestions.length > 0) {
+            html += "<p><strong>Suggestions:</strong></p><ul>";
+            result.suggestions.forEach(
+              (suggestion) =>
+                (html += `<li style="color: blue;">${suggestion}</li>`)
+            );
+            html += "</ul>";
+          }
+
+          if (result.facts && result.facts.length > 0) {
+            html += "<p><strong>Technical Details:</strong></p><ul>";
+            result.facts.forEach((fact) => (html += `<li>${fact}</li>`));
+            html += "</ul>";
+          }
+
+          if (result.stats) {
+            html += "<p><strong>Stats:</strong></p><ul>";
+            Object.entries(result.stats).forEach(([key, value]) => {
+              html += `<li>${key}: ${value}</li>`;
+            });
+            html += "</ul>";
+          }
+        }
+
+        output.innerHTML = html;
+      }
+
+      async function generateAudio() {
+        const text = document.getElementById("textInput").value.trim();
+        const output = document.getElementById("output");
+        const audioPlayer = document.getElementById("audioPlayer");
+
+        if (!text) {
+          output.innerHTML =
+            '<p style="color: red;">Please enter some Base64 text!</p>';
+          return;
+        }
+
+        try {
+          output.innerHTML = "<p>Generating audio...</p>";
+
+          const response = await fetch("/generate", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ text: text }),
+          });
+
+          if (response.ok) {
+            const audioBlob = await response.blob();
+            const audioUrl = URL.createObjectURL(audioBlob);
+
+            audioPlayer.src = audioUrl;
+            audioPlayer.style.display = "block";
+
+            if (audioPlayer.dataset.prevUrl) {
+              URL.revokeObjectURL(audioPlayer.dataset.prevUrl);
             }
-        });
+            audioPlayer.dataset.prevUrl = audioUrl;
+
+            output.innerHTML =
+              '<p style="color: green;">✓ Audio generated successfully!</p>';
+          } else {
+            const error = await response.text();
+            output.innerHTML = `<p style="color: red;">Server error: ${error}</p>`;
+          }
+        } catch (error) {
+          output.innerHTML = `<p style="color: red;">Error: ${error.message}</p>`;
+        }
+      }
+
+      function loadExample(type) {
+        const textarea = document.getElementById("textInput");
+        const output = document.getElementById("output");
+
+        if (type === "random") {
+          // Generate random bytes that should make interesting audio
+          const randomBytes = new Uint8Array(800);
+          for (let i = 0; i < randomBytes.length; i++) {
+            randomBytes[i] = Math.floor(Math.random() * 256);
+          }
+          textarea.value = btoa(String.fromCharCode(...randomBytes));
+          output.innerHTML =
+            "<p>Loaded random data. This should create some wild audio!</p>";
+        } else if (type === "pattern") {
+          // Generate a sine wave pattern in the data
+          const patternBytes = new Uint8Array(1000);
+          for (let i = 0; i < patternBytes.length; i++) {
+            // Create a sine wave pattern
+            patternBytes[i] = Math.floor(128 + 127 * Math.sin(i * 0.05));
+          }
+          textarea.value = btoa(String.fromCharCode(...patternBytes));
+          output.innerHTML =
+            "<p>Loaded pattern data. This should create a tone!</p>";
+        }
+      }
+
+      // Auto-analyze the default example when page loads
+      window.addEventListener("load", function () {
+        setTimeout(analyzeInput, 500);
+      });
     </script>
 
-    <div>
-        <h3>Base64 Requirements:</h3>
-        <ul>
-            <li><strong>Valid characters only:</strong> A-Z, a-z, 0-9, +, /</li>
-            <li><strong>Proper padding:</strong> Must end with correct number of = signs (0, 1, or 2)</li>
-            <li><strong>Length divisible by 4:</strong> Base64 strings must be multiples of 4 characters</li>
-            <li><strong>No whitespace or special characters</strong> (except + and /)</li>
-        </ul>
-    </div>
-</body>
+    <hr />
+    <h3>How This Works:</h3>
+    <p>
+      <strong>Analyze Input:</strong> Shows you technical details about your
+      Base64 data for audio conversion
+    </p>
+    <p>
+      <strong>Generate Audio:</strong> Converts your Base64 to a playable audio
+      file - any data makes sound!
+    </p>
+    <p>
+      <strong>Examples:</strong> Try random data or patterns to hear different
+      audio effects
+    </p>
+
+    <h3>WAV Audio Requirements:</h3>
+    <ul>
+      <li>WAV files need proper headers (RIFF...WAVE format)</li>
+      <li>16-bit audio needs even number of bytes (2 bytes per sample)</li>
+      <li>More data = longer audio duration</li>
+    </ul>
+  </body>
 </html>
